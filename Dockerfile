@@ -1,17 +1,17 @@
-# inspired by https://github.com/hauptmedia/docker-jmeter  and
-# https://github.com/hhcordero/docker-jmeter-server/blob/master/Dockerfile
 FROM alpine:3.12
 
-MAINTAINER Just van den Broecke<just@justobjects.nl>
+MAINTAINER Ramon de Pieri Saraiva
 
-ARG JMETER_VERSION="5.3"
+ARG JMETER_VERSION="5.4"
 ENV JMETER_HOME /opt/apache-jmeter-${JMETER_VERSION}
 ENV	JMETER_BIN	${JMETER_HOME}/bin
+ENV JMETER_PLUGIN_LIB ${JMETER_HOME}/lib
+ENV JMETER_PLUGIN_EXT ${JMETER_HOME}/lib/ext
 ENV	JMETER_DOWNLOAD_URL  https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz
 
 # Install extra packages
 # Set TimeZone, See: https://github.com/gliderlabs/docker-alpine/issues/136#issuecomment-612751142
-ARG TZ="Europe/Amsterdam"
+ARG TZ="America/Sao_Paulo"
 ENV TZ ${TZ}
 RUN    apk update \
 	&& apk upgrade \
@@ -26,8 +26,9 @@ RUN    apk update \
 	&& tar -xzf /tmp/dependencies/apache-jmeter-${JMETER_VERSION}.tgz -C /opt  \
 	&& rm -rf /tmp/dependencies
 
-# TODO: plugins (later)
-# && unzip -oq "/tmp/dependencies/JMeterPlugins-*.zip" -d $JMETER_HOME
+# plugins
+ADD plugins_lib $JMETER_PLUGIN_LIB
+ADD plugins_ext $JMETER_PLUGIN_EXT
 
 # Set global PATH such that "jmeter" command is found
 ENV PATH $PATH:$JMETER_BIN
